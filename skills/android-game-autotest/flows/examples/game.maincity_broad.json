@@ -1,0 +1,71 @@
+{
+  "name": "示例游戏 主城操作广度覆盖",
+  "description": "覆盖主城全部可操作入口与面板内部页签/按钮：8 个安全入口逐个打开-内部操作-关闭，任务系统双页签，玩法面板1升级链路。所有坐标均为真机实测（1080x2408）。某活动入口已知必崩（stack corruption），故意不纳入本流程，见 references/troubleshooting.md。",
+  "vars": {
+    "PKG": "com.example.game",
+    "ACCOUNT": "demo02"
+  },
+  "device": {"stay_awake": true, "unlock": true},
+  "steps": [
+    {"id": "wake", "action": "wake"},
+    {"id": "ime-off", "action": "ime", "mode": "off", "message": "关掉中文输入法，避免 input text 被拼音组词污染"},
+    {"id": "restart", "action": "force_stop", "package": "${PKG}"},
+    {"id": "mark", "action": "logcat_mark"},
+    {"id": "launch", "action": "launch", "package": "${PKG}", "expect_activity": "${PKG}", "timeout": 40, "wait": 3.0, "screenshot": false},
+    {"id": "wait-login", "action": "wait_template", "template": "templates/login_start_btn.png", "timeout": 120, "threshold": 0.88, "scale": 2, "message": "等登录页出现「开始游戏」"},
+    {"id": "tap-start", "action": "wait_template", "template": "templates/login_start_btn.png", "tap": true, "threshold": 0.88, "scale": 2, "timeout": 20, "screenshot": false},
+    {"id": "probe-role", "action": "probe_template", "template": "templates/role_title.png", "threshold": 0.85, "scale": 2, "save": "NEED_ROLE", "screenshot": false},
+    {"id": "pick-role", "action": "wait_template", "template": "templates/role_confirm_btn.png", "scale": 1, "tap": true, "timeout": 25, "when": "NEED_ROLE"},
+    {"id": "wait-maincity", "action": "wait_template", "template": "templates/maincity_action_btn.png", "timeout": 120, "threshold": 0.88, "scale": 2, "message": "等主城主要操作按钮"},
+    {"id": "dismiss-tutorial", "action": "dismiss_tutorial", "color": "red", "box": [0.30, 0.03, 0.40, 0.10], "min_pixels": 300, "timeout": 14, "message": "关新手引导浮层（延迟 1~2 秒才弹，会拦截所有点击）"},
+    {"id": "settle", "action": "wait_stable", "timeout": 20, "settle": 1.2, "interval": 0.6, "screenshot": false},
+
+    {"id": "yc-open", "action": "probe_entry", "ratio": [0.902, 0.196], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开玩法面板1"},
+    {"id": "yc-tab-upgrade", "action": "tap", "ratio": [0.7333, 0.299], "message": "切到「系统升级」页签（实测真实坐标 y=720，视觉估算的 y=549 点不中）"},
+    {"id": "yc-shot-upgrade", "action": "screenshot", "name": "yc-upgrade-tab"},
+    {"id": "yc-tap-upgrade-btn", "action": "tap", "ratio": [0.4481, 0.5772], "message": "点「升级」按钮，会弹出详情浮层"},
+    {"id": "yc-shot-item", "action": "screenshot", "name": "yc-item-detail"},
+    {"id": "yc-close", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.88, "timeout": 25, "message": "详情浮层只能点底部空白 (0.5, 0.92) 关闭，上方空白无效"},
+
+    {"id": "fb-open", "action": "probe_entry", "ratio": [0.902, 0.276], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开玩法面板3"},
+    {"id": "fb-tap-item", "action": "tap", "ratio": [0.167, 0.365], "message": "点「道具卡A」，弹出道具详情"},
+    {"id": "fb-shot", "action": "screenshot", "name": "fb-item"},
+    {"id": "fb-close", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.88, "timeout": 25},
+
+    {"id": "ym-open", "action": "probe_entry", "ratio": [0.902, 0.372], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开玩法面板2（关闭用左上箭头，不是红X）"},
+    {"id": "ym-shot", "action": "screenshot", "name": "ym-panel"},
+    {"id": "ym-close", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.88, "timeout": 25, "arrow_ratio": [0.065, 0.125]},
+
+    {"id": "sz-open", "action": "probe_entry", "ratio": [0.906, 0.7575], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开设置"},
+    {"id": "sz-shot", "action": "screenshot", "name": "sz-panel"},
+    {"id": "sz-close", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.88, "timeout": 25},
+
+    {"id": "yx-open", "action": "probe_entry", "ratio": [0.650, 0.815], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开邮箱"},
+    {"id": "yx-shot", "action": "screenshot", "name": "yx-panel"},
+    {"id": "yx-close", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.88, "timeout": 25},
+
+    {"id": "ph-open", "action": "probe_entry", "ratio": [0.761, 0.815], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开排行（关闭用左上返回文字，不是红X）"},
+    {"id": "ph-shot", "action": "screenshot", "name": "ph-panel"},
+    {"id": "ph-close", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.88, "timeout": 30, "back_text_ratio": [0.18, 0.071]},
+
+    {"id": "ck-open", "action": "probe_entry", "ratio": [0.8676, 0.815], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开仓库"},
+    {"id": "ck-tab-item", "action": "tap", "ratio": [0.398, 0.193], "message": "切「道具」页签"},
+    {"id": "ck-tab-hero", "action": "tap", "ratio": [0.574, 0.193], "message": "切「英雄碎片」页签"},
+    {"id": "ck-shot", "action": "screenshot", "name": "ck-panel"},
+    {"id": "ck-close", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.88, "timeout": 25},
+
+    {"id": "yl-open", "action": "probe_entry", "ratio": [0.5, 0.612], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开背包面板（关闭用左上箭头）"},
+    {"id": "yl-shot", "action": "screenshot", "name": "yl-panel"},
+    {"id": "yl-close", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.88, "timeout": 25, "arrow_ratio": [0.065, 0.125]},
+
+    {"id": "task-open", "action": "probe_entry", "ratio": [0.222, 0.810], "expect": "templates/maincity_action_btn.png", "package": "${PKG}", "message": "打开主线任务面板"},
+    {"id": "task-tab-daily", "action": "tap", "ratio": [0.398, 0.266], "message": "切「每日任务」页签（实测 y=640）"},
+    {"id": "task-shot-daily", "action": "screenshot", "name": "task-daily"},
+    {"id": "task-goto", "action": "tap", "ratio": [0.788, 0.4839], "message": "点「前往」（任务跳转）——会关掉面板跳回主城"},
+    {"id": "task-after-goto", "action": "wait_template", "template": "templates/maincity_action_btn.png", "timeout": 20, "threshold": 0.88, "scale": 2, "message": "「前往」跳转后应回到主城"},
+
+    {"id": "check-crash", "action": "check_crash", "must_clean": true, "message": "全程不应有崩溃（良性告警已自动剔除）"},
+    {"id": "dump-logcat", "action": "dump_logcat", "name": "logcat-broad"},
+    {"id": "final", "action": "screenshot", "name": "final"}
+  ]
+}

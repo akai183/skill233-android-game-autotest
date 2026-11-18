@@ -1,0 +1,63 @@
+{
+  "name": "启动冒烟（模板）",
+  "description": "拉起游戏 → 等画面稳定 → 留证 → 扫崩溃。这是模板，__PKG__ / __ACTIVITY__ 由 scripts/new_flow.py 替换，不要直接跑。",
+  "vars": {},
+  "device": {
+    "stay_awake": true,
+    "unlock": true
+  },
+  "steps": [
+    {
+      "id": "wake",
+      "action": "wake",
+      "screenshot": false
+    },
+    {
+      "id": "mark",
+      "action": "logcat_mark",
+      "screenshot": false
+    },
+    {
+      "id": "stop",
+      "action": "force_stop",
+      "package": "__PKG__",
+      "screenshot": false
+    },
+    {
+      "id": "launch",
+      "action": "launch",
+      "package": "__PKG__",
+      "expect_activity": "__ACTIVITY__",
+      "timeout": 30
+    },
+    {
+      "id": "stable",
+      "action": "wait_stable",
+      "timeout": 90,
+      "settle": 3.0,
+      "interval": 1.0,
+      "message": "画面已稳定"
+    },
+    {
+      "id": "shot",
+      "action": "screenshot",
+      "name": "loaded"
+    },
+    {
+      "id": "crash",
+      "action": "check_crash",
+      "must_clean": true
+    },
+    {
+      "id": "log",
+      "action": "dump_logcat",
+      "name": "logcat-full",
+      "screenshot": false
+    },
+    {
+      "id": "final",
+      "action": "screenshot",
+      "name": "final"
+    }
+  ]
+}

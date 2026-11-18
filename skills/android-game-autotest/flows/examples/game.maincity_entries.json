@@ -1,0 +1,65 @@
+{
+  "name": "示例游戏 主城入口巡检",
+  "description": "逐个打开主城 7 个功能入口，验证每个面板都能打开、都能关掉回到主城。每个入口后面都跟一个 assert_gone 断言主城模板消失——否则点偏了/被浮层挡住时，close_panel 会因为『一开始就匹配主城』而假通过（这是实际踩过的坑）。关面板用 close_panel：它按「红X色块 → 右上X坐标 → 左上箭头 → 左上返回文字 → 浮层外空白」轮换尝试，每轮都用主城模板验证是否真的回来了。开头会尝试关掉新手引导浮层（顶部红X），没有就跳过。",
+  "vars": {
+    "PKG": "com.example.game",
+    "ACTIVITY": "com.unity3d.player.UnityPlayerActivity"
+  },
+  "device": {"stay_awake": true, "unlock": true},
+  "steps": [
+    {"id": "wake", "action": "wake"},
+    {"id": "restart", "action": "force_stop", "package": "${PKG}"},
+    {"id": "launch", "action": "launch", "package": "${PKG}", "expect_activity": "${PKG}", "timeout": 40, "wait": 3.0},
+    {"id": "wait-login", "action": "wait_template", "template": "templates/login_start_btn.png", "timeout": 120, "threshold": 0.88, "message": "等登录页"},
+    {"id": "tap-start", "action": "wait_template", "template": "templates/login_start_btn.png", "tap": true, "threshold": 0.88, "message": "点「开始游戏」（账号已自动回填）"},
+    {"id": "wait-maincity", "action": "wait_template", "template": "templates/maincity_action_btn.png", "timeout": 120, "threshold": 0.88, "message": "等主城出现主操作按钮"},
+
+    {"id": "dismiss-tutorial", "action": "dismiss_tutorial", "color": "red", "box": [0.30, 0.03, 0.40, 0.10], "min_pixels": 300, "timeout": 15, "interval": 0.8, "max_taps": 3, "message": "轮询等新手引导浮层出现并点顶部红X关掉（它会延迟 1~2 秒才弹，立刻查会漏）"},
+    {"id": "settle", "action": "wait_stable", "timeout": 20, "settle": 1.0, "interval": 0.6, "message": "等画面稳定（浮层关掉后主城可能重排）"},
+    {"id": "shot-maincity", "action": "screenshot", "name": "maincity"},
+
+    {"id": "open-fishing-ground", "action": "tap", "ratio": [0.902, 0.196], "message": "打开玩法面板1（实测 y=0.196，右列图标带 y 405-537）"},
+    {"id": "verify-fishing-ground", "action": "assert_gone", "template": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 10, "message": "确认玩法面板1真的打开了（主城模板必须消失）"},
+    {"id": "shot-fishing-ground", "action": "screenshot", "name": "panel-fishing-ground"},
+    {"id": "close-fishing-ground", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 25},
+
+    {"id": "open-artifact", "action": "tap", "ratio": [0.902, 0.276], "message": "打开玩法面板3（实测 y=0.276，图标带 y 580-749）"},
+    {"id": "verify-artifact", "action": "assert_gone", "template": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 10, "message": "确认玩法面板3真的打开了"},
+    {"id": "shot-artifact", "action": "screenshot", "name": "panel-artifact"},
+    {"id": "close-artifact", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 25},
+
+    {"id": "open-fish-sale", "action": "tap", "ratio": [0.902, 0.372], "message": "打开玩法面板2（实测 y=0.372，图标带 y 829-963；原来的 0.440 是空档）"},
+    {"id": "verify-fish-sale", "action": "assert_gone", "template": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 10, "message": "确认玩法面板2真的打开了"},
+    {"id": "shot-fish-sale", "action": "screenshot", "name": "panel-fish-sale"},
+    {"id": "close-fish-sale", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 25},
+
+    {"id": "open-settings", "action": "tap", "ratio": [0.906, 0.7575], "message": "打开设置（实测 y=0.7575，图标带 y 1781-1868；0.902/0.762 会点到仓库）"},
+    {"id": "verify-settings", "action": "assert_gone", "template": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 10, "message": "确认设置真的打开了"},
+    {"id": "shot-settings", "action": "screenshot", "name": "panel-settings"},
+    {"id": "close-settings", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 25},
+
+    {"id": "open-mail", "action": "tap", "ratio": [0.650, 0.815], "message": "打开邮箱"},
+    {"id": "verify-mail", "action": "assert_gone", "template": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 10, "message": "确认邮箱真的打开了"},
+    {"id": "shot-mail", "action": "screenshot", "name": "panel-mail"},
+    {"id": "close-mail", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 25},
+
+    {"id": "open-rank", "action": "tap", "ratio": [0.762, 0.815], "message": "打开排行"},
+    {"id": "verify-rank", "action": "assert_gone", "template": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 10, "message": "确认排行真的打开了"},
+    {"id": "shot-rank", "action": "screenshot", "name": "panel-rank"},
+    {"id": "close-rank", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 25},
+
+    {"id": "open-warehouse", "action": "tap", "ratio": [0.868, 0.815], "message": "打开仓库"},
+    {"id": "verify-warehouse", "action": "assert_gone", "template": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 10, "message": "确认仓库真的打开了"},
+    {"id": "shot-warehouse", "action": "screenshot", "name": "panel-warehouse"},
+    {"id": "close-warehouse", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 25},
+
+    {"id": "modal-coin", "action": "tap", "ratio": [0.213, 0.048], "message": "点货币计数弹出「获取途径」浮层"},
+    {"id": "verify-modal", "action": "assert_gone", "template": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 10, "message": "确认浮层真的弹出来了"},
+    {"id": "shot-modal", "action": "screenshot", "name": "modal-coin"},
+    {"id": "close-modal", "action": "close_panel", "expect": "templates/maincity_action_btn.png", "threshold": 0.90, "timeout": 25},
+
+    {"id": "check-crash", "action": "check_crash", "must_clean": true, "message": "巡检全程不应有崩溃（良性告警已自动剔除）"},
+    {"id": "dump-logcat", "action": "dump_logcat", "name": "logcat-entries"},
+    {"id": "final", "action": "screenshot", "name": "final"}
+  ]
+}

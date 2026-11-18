@@ -1,0 +1,5 @@
+# 跑测产物与本地产物，不进版本库
+runs/
+local/
+__pycache__/
+*.pyc
