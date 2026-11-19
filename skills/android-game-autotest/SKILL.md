@@ -42,6 +42,7 @@ description: 用 adb 驱动安卓真机，在**不改动游戏客户端**的前�
 ```
 安卓实机跑测/
 ├── SKILL.md
+├── requirements.txt   Python 依赖（numpy / Pillow 浮动下限）
 ├── scripts/
 │   ├── adbkit.py     设备驱动层：连接、截图、点击、uiautomator、logcat、崩溃识别、自愈
 │   ├── vision.py     图像层：Frame、灰度、帧差、dhash、模板匹配、DigitOCR
@@ -59,14 +60,23 @@ description: 用 adb 驱动安卓真机，在**不改动游戏客户端**的前�
 └── runs/             跑测产物（已 gitignore）
 ```
 
-依赖：**Python 3.9+**、`numpy`、`Pillow`、`adb`。没有 cv2 / scipy 依赖。
+依赖：**Python 3.13+**、`numpy`、`Pillow`、`adb`。没有 cv2 / scipy 依赖。
+
+版本下限钉在 3.13 的理由：3.9 已于 2025-10-31 EOL、3.10 已于 2026-10-01 EOL；且 3.9/3.10 上
+pip 只能解析到 numpy 2.0.x / Pillow 11.3，拿不到新版。代码本身在 3.9–3.15 全都能跑（无 3.10+ 独占
+语法、无 numpy 2.0 移除别名、无已删 stdlib 模块），所以这个下限是政策选择而非技术限制 —— 要放宽
+随时可以，但别低于受支持版本。3.13 支持到 2029-10、3.14 到 2030-10、3.15 到 2031-10。
 
 ```powershell
-python -m pip install numpy pillow
+python -m pip install -r requirements.txt
 $env:ADB = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"   # 不在 PATH 时才需要
 ```
 
-POSIX 下同样：`python3 -m pip install numpy pillow`、`export ADB=~/Library/Android/sdk/platform-tools/adb`。
+POSIX 下同样：`python3 -m pip install -r requirements.txt`、`export ADB=~/Library/Android/sdk/platform-tools/adb`。
+
+`requirements.txt` 钉的是浮动下限：`numpy>=2.3,<3`、`pillow>=12,<14`（不是死锁版本）。下限是
+**实测过的最低可工作组合**（numpy 2.3.5 + Pillow 12.3.0 在 3.13 上跑通全部离线用例与 5 个流程校验）；
+实际装出来通常是 numpy 2.5.5 + Pillow 13.0.0。上限用 `<3` / `<14` 是为了挡住未来的大版本破坏性变更。
 `adbkit` 会按 `ADB` → `ANDROID_HOME`/`ANDROID_SDK_ROOT` → 各平台常见安装位置 → PATH 的顺序自己找，
 找不到会明确报错，不会假装成功。
 

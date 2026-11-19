@@ -27,6 +27,7 @@ skill233-android-phone-debug/
 └── skills/
     └── android-game-autotest/
         ├── SKILL.md                    Agent 使用入口：何时用、作业顺序、判读口径
+        ├── requirements.txt            Python 依赖（numpy / Pillow 浮动下限）
         ├── scripts/
         │   ├── adbkit.py               设备驱动层：连接、截图、点击、uiautomator、logcat、崩溃识别、自愈
         │   ├── vision.py               图像层：Frame、帧差、dhash、模板匹配、颜色定位、DigitOCR
@@ -65,7 +66,14 @@ cp -r skill233-android-phone-debug/skills/android-game-autotest ~/.claude/skills
 cp -r skill233-android-phone-debug/skills/android-game-autotest ~/.config/opencode/skills/
 ```
 
-依赖：Python 3.9+、`numpy`（`vision.py` 用到）、`adb`（Platform Tools）。不需要 Node，不需要 Appium，不需要 Android Studio。
+依赖：Python 3.13+、`numpy`、`Pillow`、`adb`（Platform Tools）。不需要 Node，不需要 Appium，不需要 Android Studio。
+
+Python 下限是 3.13：3.9 已于 2025-10-31 EOL、3.10 已于 2026-10-01 EOL，且在它们上面 pip 只能解析到
+numpy 2.0.x / Pillow 11.3。代码本身在 3.9–3.15 全都能跑，所以这是政策下限而非技术限制。装依赖：
+
+```bash
+python -m pip install -r skills/android-game-autotest/requirements.txt
+```
 
 ## 快速开始
 

@@ -1,0 +1,14 @@
+# 安卓实机跑测 —— Python 依赖
+# 要求 Python 3.13+（3.9/3.10 均已 EOL，且拿不到新版 numpy/Pillow）
+#
+# 钉的是浮动下限，不是死锁版本：
+#   - 下限 numpy 2.3.5 / Pillow 12.3.0 是实测过的最低可工作组合
+#   - 上限 <3 / <14 用来挡未来的大版本破坏性变更
+#   - 实际装出来通常是 numpy 2.5.5 + Pillow 13.0.0
+#
+# 安装：python -m pip install -r requirements.txt
+# 已实测的通过组合：numpy 2.3.5 + Pillow 12.3.0 / numpy 2.5.5 + Pillow 13.0.0
+#                   （Python 3.13.18 / 3.14.10 / 3.15.2 上全部离线用例与流程校验通过）
+
+numpy>=2.3,<3
+pillow>=12,<14
