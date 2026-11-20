@@ -53,7 +53,9 @@ def _need_vision():
         return mod
     except ModuleNotFoundError as e:
         raise RuntimeError(
-            "图像判定需要 numpy + Pillow：python -m pip install numpy pillow"
+            "图像判定需要 numpy + Pillow：在技能根目录执行 "
+            "python -m pip install -r requirements.txt（Python 3.13+）；"
+            "只想临时装也可以 python -m pip install \"numpy>=2.3,<3\" \"pillow>=12,<14\""
         ) from e
 
 

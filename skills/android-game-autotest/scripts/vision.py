@@ -9,7 +9,7 @@ vision.py — 屏幕图像判定层
   - 进度百分比是多少（数字模板 OCR，模板可从真实截图自举）
 
 依赖：numpy + Pillow（无 cv2 / 无 scipy，纯 Python 实现，跨平台）
-      装依赖：python -m pip install numpy pillow
+      装依赖：在技能根目录执行 python -m pip install -r requirements.txt（Python 3.13+）
 
 坐标约定：全部使用设备物理像素，左上原点（与 adb screencap 一致）。
 """
